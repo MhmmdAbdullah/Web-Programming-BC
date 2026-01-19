@@ -7,8 +7,10 @@ import {FiShoppingBag} from "react-icons/fi";
 import CartPopup from "../ui/cart-popup";
 import React, {useEffect} from "react";
 import { usePathname } from "next/navigation";
+import { useCartStore } from "@/app/hooks/use-cart-store";
 
 const Header = () => {
+    const {items} = useCartStore();
     const [isCartOpen, setIsCartOpen] = React.useState(false);
     const pathname = usePathname()
 
@@ -17,8 +19,8 @@ const Header = () => {
     }, [pathname]);
 
     return (
-        <header>
-            <div className="flex justify-between items-center gap-10 container mx-auto  py-7">
+        <header className="fixed w-full z-20 backdrop-blur-3xl bg-white/50">
+            <div className="flex justify-between items-center gap-10 container mx-auto py-7">
                 <Link href='/'>
                     <Image
                     src="/images/logo.svg"
@@ -44,7 +46,14 @@ const Header = () => {
                         onClick={() => setIsCartOpen(!isCartOpen)}
                     >
                         <FiShoppingBag size={24}/>
-                        <div className="bg-primary rounded-full w-3.5 h-3.5 absolute -top-1 -right-1 text-[10px] text-center text-white">3</div>
+                        {items.length ? (
+                        <div className="bg-primary rounded-full w-3.5 h-3.5 absolute -top-1 -right-1 text-[10px] text-center text-white">
+                            {items.length}
+                        </div>
+                        ) : (
+                            <></>
+                        )
+                        }
                     </button>
                     {isCartOpen && <CartPopup/>}
                 </div>

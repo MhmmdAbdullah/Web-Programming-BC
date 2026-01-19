@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { FiArrowRight } from "react-icons/fi";
 import Image from "next/image";
+import { Category } from "@/app/types";
+import { getImageUrl } from "@/app/lib/api";
 
 const categoriesList = [
     { name: 'Running', image: 'images/categories/category-running.svg', w:86, h:86 },
@@ -10,10 +12,14 @@ const categoriesList = [
     { name: 'Badminton', image: 'images/categories/category-badminton.svg', w:98, h:98 },
     { name: 'Swimming', image: 'images/categories/category-swimming.svg', w:76, h:76 },
     
-   
-    
+
 ];
-const CategoriesSection = () => {
+
+type TCategoriesProps = {
+    categories : Category[];
+}
+    
+const CategoriesSection = ({categories} : TCategoriesProps) => {
     return (
         <section id="categories-section" className="container mx-auto">
             <div className="flex justify-between pb-8">
@@ -24,12 +30,12 @@ const CategoriesSection = () => {
                 </Link>
             </div>
             <div className="grid grid-cols-6 items-center gap-[46px]">
-                {categoriesList.map((category, index) => (
-                    <div key={index} className="flex flex-col gap-3 pt-4 justify-center items-center rounded-lg bg-gradient-to-r from-[#F1F1F1] to-[#F7F7F7] w-full aspect-square">
+                {categories.map((category) => (
+                    <div key={category._id} className="flex flex-col gap-3 pt-4 justify-center items-center rounded-lg bg-gradient-to-r from-[#F1F1F1] to-[#F7F7F7] w-full aspect-square">
                         <Image 
-                            src={category.image} 
-                            width={category.w} 
-                            height={category.h} 
+                            src={getImageUrl(category.imageUrl)} 
+                            width={86} 
+                            height={86} 
                             alt={category.name}
                             className="h-24"
                         />

@@ -1,21 +1,62 @@
 "use client";
 
-import { CartList } from "../ui/cart-popup";
+
 import PriceFormatter from "@/app/utils/price-formatter";
 import CardWithHeader from "../ui/card-with-header";
 import FileUpload from "../ui/file-upload";
 import Button from "../ui/button";
 import { FiCheckCircle } from "react-icons/fi";
 import { useRouter } from "next/navigation";
+import { useCartStore } from "@/app/hooks/use-cart-store";
+import { useState } from "react";
+import { transactionCheckout } from "@/app/services/transaction.service";
 
 const PaymentSteps = () => {
     const {push} = useRouter();
+    const {items, customerInfo, reset} = useCartStore();
+    const [file, setFile] = useState<File | null>();
 
     const uploadAndConfirm = () => {
         push("/order-status/123123123")
     }
 
-    const totalPrice = CartList.reduce((total, item) => total + item.price * item.qty, 0);
+    const totalPrice = items.reduce((total, item) => total + item.price * item.qty, 0);
+
+    const handleConfirmPayment = async () => {
+        if (!file) {
+            alert("Please upload yourn payment receipt");
+            return;
+        }
+
+        if (!customerInfo) {
+            alert("Customer information is missing, please return to checkout");
+            push("/checkout")
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("customerName", customerInfo.customerName);
+            formData.append("customerContact", customerInfo.customerContact!.toString());
+            formData.append("customerAddress", customerInfo.customerAddress);
+            formData.append("image", file);
+            formData.append("purchasedItems", 
+                JSON.stringify(items.map((item) => ({productId: item._id, qty: item.qty})))
+            );
+            formData.append("totalPayment", totalPrice.toString());
+
+            const res = await transactionCheckout(formData)
+
+            alert('Transaction created successfully!')
+            reset();
+            push(`/order-status/${res._id}`)
+
+        } catch(error){
+            console.log(error)
+        }
+    }
+
+    
 
     return <CardWithHeader title="Payment Steps">
         <div className="p-5">
@@ -34,7 +75,7 @@ const PaymentSteps = () => {
                     Receipt & Confirm'</b> button below to validate your transaction.
                 </li>     
             </ol>
-            <FileUpload />
+            <FileUpload onFileSelect={setFile}/>
         </div>
         <div className="border-t border-gray-200 p-4">
             <div className="flex justify-between font-semibold">
@@ -44,7 +85,7 @@ const PaymentSteps = () => {
             <Button 
                 variant="dark" 
                 className="w-full mt-4"
-                onClick={uploadAndConfirm}    
+                onClick={handleConfirmPayment}    
             >
                 <FiCheckCircle size={22} /> Upload Receipt & Confirm
             </Button>
