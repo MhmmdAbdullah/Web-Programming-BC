@@ -13,14 +13,16 @@ import { transactionCheckout } from "@/app/services/transaction.service";
 
 const PaymentSteps = () => {
     const {push} = useRouter();
-    const {items, customerInfo, reset} = useCartStore();
+    const {items, customerInfo, reset, checkoutItem, clearCheckoutItem} = useCartStore();
     const [file, setFile] = useState<File | null>();
 
     const uploadAndConfirm = () => {
         push("/order-status/123123123")
     }
 
-    const totalPrice = items.reduce((total, item) => total + item.price * item.qty, 0);
+    const displayItems = checkoutItem ? [checkoutItem] : items;
+
+    const totalPrice = displayItems.reduce((total, item) => total + item.price * item.qty, 0);
 
     const handleConfirmPayment = async () => {
         if (!file) {
@@ -41,14 +43,18 @@ const PaymentSteps = () => {
             formData.append("customerAddress", customerInfo.customerAddress);
             formData.append("image", file);
             formData.append("purchasedItems", 
-                JSON.stringify(items.map((item) => ({productId: item._id, qty: item.qty})))
+                JSON.stringify(displayItems.map((item) => ({productId: item._id, qty: item.qty})))
             );
             formData.append("totalPayment", totalPrice.toString());
 
             const res = await transactionCheckout(formData)
 
             alert('Transaction created successfully!')
-            reset();
+            if (checkoutItem) {
+                clearCheckoutItem();
+            } else {
+                reset();
+            }
             push(`/order-status/${res._id}`)
 
         } catch(error){

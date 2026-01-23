@@ -12,15 +12,22 @@ import { useCartStore } from "@/app/hooks/use-cart-store";
 
 type TProductsProps = {
     products: Product[];
+    stock: number;
 }
 
-const ProductsSection = ({products}: TProductsProps) => {
-    const {addItem} = useCartStore()
+const ProductsSection = ({products, stock}: TProductsProps) => {
+    const {items, addItem} = useCartStore()
 
-    const handleAddtoCart = (e: React.MouseEvent, product: Product) => {
+    const handleAddtoCart = (e: React.MouseEvent, product: Product, stock: number) => {
         e.preventDefault();
         e.stopPropagation();
-        addItem(product)
+        const itemInCart = items.find((item) => item._id === product._id);
+        const currentQty = itemInCart ? itemInCart.qty : 0;
+        if (currentQty + 1 <= stock) {
+            addItem(product);
+        } else {
+            alert(`Can't add more item. Maximum stock reached ${stock} items.`);
+        }
     }
 
     return <section id="products-section" className="container mx-auto mt-32 mb-64">
@@ -42,7 +49,7 @@ const ProductsSection = ({products}: TProductsProps) => {
                             alt={product.name}/>
                         <Button 
                          className="w-10 h-10 p-2! absolute top-[8px] right-[8px]"
-                         onClick={(e) => handleAddtoCart(e, product)} 
+                         onClick={(e) => handleAddtoCart(e, product, product.stock)} 
                         >
                             <FiPlus size={24} className="text-white m-auto"/>
                         </Button>
