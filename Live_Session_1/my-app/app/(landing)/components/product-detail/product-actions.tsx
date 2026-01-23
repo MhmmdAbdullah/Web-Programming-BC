@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/app/hooks/use-cart-store";
 import { Product } from "@/app/types";
-
+import CartPopup from "../ui/cart-popup";
 
 type TProductActionProps = {
     product: Product;
@@ -14,16 +14,23 @@ type TProductActionProps = {
 }
 
 const ProductActions = ({product, stock}: TProductActionProps) => {
-  const {addItem} = useCartStore();
+  const {items, setCheckoutItem, addItem} = useCartStore();
   const {push} = useRouter()  
   const [quantity, setQuantity] = useState(1);
-
+  
   const handleAddtoCart = () => {
-    addItem(product, quantity)
+    const itemInCart = items.find((item) => item._id === product._id);
+    const currentQty = itemInCart ? itemInCart.qty : 0;
+    if (currentQty + 1 <= stock) {
+        addItem(product, quantity);
+    } else {
+        alert(`Can't add more item. Maximum stock reached ${stock} items.`);
+    }
   }
 
-  const checkout = () => {
-    push("/checkout")
+  const checkout = () => {  
+    setCheckoutItem(product, quantity);  
+    push("/checkout");
   }
 
   return (

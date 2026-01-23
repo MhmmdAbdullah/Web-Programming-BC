@@ -15,8 +15,11 @@ export interface CustomerInfo {
 interface CartStore {
     customerInfo: CustomerInfo | null;
     items: CartItem[];
+    checkoutItem: CartItem | null;
     setCustomerInfo: (info: CustomerInfo) => void;
     addItem: (product: Product, qty?: number) => void;
+    setCheckoutItem: (product: Product, qty: number) => void;
+    clearCheckoutItem: () => void;
     removeItem: (productId: string) => void;
     reset: () => void;
 }
@@ -26,6 +29,7 @@ export const useCartStore = create<CartStore>()(
         (set, get) => ({
             customerInfo: null,
             items: [],
+            checkoutItem: null,
             setCustomerInfo: (info) => {
                 set({customerInfo: info})
             },
@@ -42,12 +46,24 @@ export const useCartStore = create<CartStore>()(
                     set({items: [...items, {...product, qty}]})
                 }
             },
+
+            setCheckoutItem: (product, qty) => {
+            set({ checkoutItem: { ...product, qty } });
+            },
+            
             removeItem: (productId) => {
                 set({items: get().items.filter((item) => item._id !== productId)})
             },
+            
+            clearCheckoutItem: () =>{ 
+                set({ checkoutItem: null })
+            },
+
             reset: () => {
-                set({items: [], customerInfo: null})
+                set({items: [], customerInfo: null, checkoutItem: null})
             }
+
+            
         }),
         {
         name: "cart-storage"

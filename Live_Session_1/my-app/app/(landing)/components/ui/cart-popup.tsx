@@ -14,6 +14,10 @@ const CartPopup = () => {
     const totalPrice = items.reduce((total, item) => total + item.price * item.qty, 0);
 
     const handleCheckout = () => {
+        if (!items.length) {
+            alert("There are no items in your cart.");
+            return;
+        }
         push("/checkout")
     }
 

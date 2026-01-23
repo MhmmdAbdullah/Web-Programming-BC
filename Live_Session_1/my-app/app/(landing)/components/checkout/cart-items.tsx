@@ -14,19 +14,29 @@ type TCartItems = {
 }
 
 const CartItems = ({handlePayment}: TCartItems) => {
-    const {items, removeItem} = useCartStore();
+    const {items, removeItem, checkoutItem, clearCheckoutItem} = useCartStore();
     const {push} = useRouter();
 
-    const totalPrice = items.reduce((total, item) => total + item.price * item.qty, 0);
+    const displayItems = checkoutItem ? [checkoutItem] : items;
+
+    const handleRemove = (id: string) => {
+    if (checkoutItem) {
+        clearCheckoutItem();
+    } else {
+        removeItem(id);
+    }
+    };
+
+    const totalPrice = displayItems.reduce((total, item) => total + item.price * item.qty, 0);
 
     const Payment = () => {
         push("/payment")
-    }
+    };
 
     return (
         <CardWithHeader title="Cart Item">
             <div className="overflow-auto h-[300px]">
-                {items.length ? items.map((item) => {
+                {displayItems.length ? displayItems.map((item) => {
                      return (
                         <div                             
                             key={item._id}
@@ -51,7 +61,7 @@ const CartItems = ({handlePayment}: TCartItems) => {
                              size="small" 
                              variant="ghost" 
                              className="w-7 h-7 p-0! self-center ml-auto"
-                             onClick={() => removeItem(item._id)}
+                             onClick={() => handleRemove(item._id)}
                              >
                                 <FiTrash2/>
                             </Button>
