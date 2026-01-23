@@ -12,10 +12,10 @@ import { useCartStore } from "@/app/hooks/use-cart-store";
 
 type TProductsProps = {
     products: Product[];
-    stock: number;
+    
 }
 
-const ProductsSection = ({products, stock}: TProductsProps) => {
+const ProductsSection = ({products}: TProductsProps) => {
     const {items, addItem} = useCartStore()
 
     const handleAddtoCart = (e: React.MouseEvent, product: Product, stock: number) => {
