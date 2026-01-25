@@ -35,3 +35,18 @@ html {
 .input-group textarea {
   @apply px-4 py-2.5 bg-gray-100 w-full focus:border-gray-400 outline-none text-sm;
 }
+
+/* INPUT GROUP ADMIN */ 
+
+.input-group-admin {
+  @apply mb-0;
+}
+
+.input-group-admin label {
+  @apply block text-xs mb-2 font-medium;
+}
+
+.input-group-admin input, .input-group-admin select,
+.input-group-admin textarea {
+  @apply px-4 py-2 w-full border border-[#DBDBDB] rounded-md focus:border-gray-400 outline-none text-sm;
+}
